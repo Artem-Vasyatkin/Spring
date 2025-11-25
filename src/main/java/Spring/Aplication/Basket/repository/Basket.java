@@ -12,7 +12,7 @@ import java.util.List;
 @SessionScope
 public class Basket {
 
-    private final List<Item> basket = new ArrayList<>();
+    private final List<Item> basket = new ArrayList();
 
     public void addAll(List<Item> items) {
         basket.addAll(items);
