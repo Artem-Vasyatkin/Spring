@@ -6,7 +6,13 @@ public class Article implements Searchable {
     private final String textArticle;
 
     public Article(String titleArticle, String textArticle) {
+        if (titleArticle == null || titleArticle.trim().isBlank()) {
+            throw new IllegalArgumentException("Название статьи не может быть пустым или null");
+        }
         this.titleArticle = titleArticle;
+        if (textArticle == null || textArticle.trim().isBlank()) {
+            throw new IllegalArgumentException("Текст статьи не может быть пустым или null");
+        }
         this.textArticle = textArticle;
     }
 
