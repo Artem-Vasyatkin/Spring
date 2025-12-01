@@ -1,14 +1,14 @@
 package org.skypro.skyshop.model;
 
 public interface Searchable {
-    String getSearchTerm();
+    String getSearchTerm();  // что искать
 
-    String getContentType();
+    String getContentType(); // тип товара
 
-    String getNameProduct();
+    String getName(); // название
 
     default String getStringRepresentation() {
-        return getNameProduct() + " - " + getContentType();
+        return getName() + " - " + getContentType();
     }
 
 }
