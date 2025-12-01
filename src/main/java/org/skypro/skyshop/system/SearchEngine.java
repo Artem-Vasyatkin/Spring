@@ -2,41 +2,32 @@ package org.skypro.skyshop.system;
 
 import org.skypro.skyshop.model.Searchable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SearchEngine {
-    private final Searchable[] searchables;
-    private int currentIndex;
+    private final List<Searchable> searchables;
+
 
     public SearchEngine(int capacity) {
-        this.searchables = new Searchable[capacity];
-        this.currentIndex = 0;
+        this.searchables = new ArrayList<>();
     }
 
     public void add(Searchable searchable) {
-        if (currentIndex < searchables.length) {
-            searchables[currentIndex] = searchable;
-            currentIndex++;
-        } else {
-            System.out.println("Невозможно добавить элемент, поисковый движок заполнен!");
-        }
+        searchables.add(searchable);
     }
 
-    public Searchable[] search(String searchString) {
-        Searchable[] results = new Searchable[5];
-        int resulsIndex = 0;
+    public List<Searchable> search(String searchString) {
+        List<Searchable> results = new ArrayList<>();
 
-        for (int i = 0; i < currentIndex; i++) {
-            Searchable item = searchables[i];
+        for (Searchable item : searchables) {
             if (item != null && item.getSearchTerm().toLowerCase().contains(searchString.toLowerCase())) {
-                results[resulsIndex] = item;
-                resulsIndex++;
-
-                if (resulsIndex >= 5) {
-                    break;
-                }
+                results.add(item);
             }
         }
         return results;
     }
+
 
     public Searchable findBestMatch (String search) throws BestResultNotFound {
         if (search == null || search.trim().isBlank()) {
@@ -47,12 +38,10 @@ public class SearchEngine {
         int maxOccurrences = 0;
         String searchLower = search.toLowerCase();
 
-        for (int i = 0; i < currentIndex; i++) {
-            Searchable item = searchables[i];
+        for (Searchable item : searchables) {
             if (item != null) {
                 String searchTerm = item.getSearchTerm().toLowerCase();
                 int occurrences = countOccurrences(searchTerm, searchLower);
-
 
                 if (occurrences > maxOccurrences) {
                     maxOccurrences = occurrences;
