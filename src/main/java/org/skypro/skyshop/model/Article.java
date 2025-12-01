@@ -2,33 +2,33 @@ package org.skypro.skyshop.model;
 
 public class Article implements Searchable {
 
-    private final String titleArticle;
-    private final String textArticle;
+    private final String title;
+    private final String text;
 
-    public Article(String titleArticle, String textArticle) {
-        if (titleArticle == null || titleArticle.trim().isBlank()) {
+    public Article(String title, String text) {
+        if (title == null || title.trim().isBlank()) {
             throw new IllegalArgumentException("Название статьи не может быть пустым или null");
         }
-        this.titleArticle = titleArticle;
-        if (textArticle == null || textArticle.trim().isBlank()) {
+        this.title = title.trim();
+        if (text == null || text.trim().isBlank()) {
             throw new IllegalArgumentException("Текст статьи не может быть пустым или null");
         }
-        this.textArticle = textArticle;
+        this.text = text.trim();
     }
 
-    public String getTitleArticle() {
-        return titleArticle;
+    public String getTitle() {
+        return title;
     }
 
-    public String getTextArticle() {
-        return textArticle;
+    public String getText() {
+        return text;
     }
 
     @Override
     public String toString() {
-        return "Article{" +
-                "Название статьи='" + titleArticle + '\'' +
-                ", Текст статьи='" + textArticle + '\'' +
+        return "СТАТЬЯ{" +
+                "Название статьи='" + title + '\'' +
+                ", Текст статьи='" + text + '\'' +
                 '}';
     }
 
@@ -39,10 +39,10 @@ public class Article implements Searchable {
 
     @Override
     public String getContentType() {
-        return "ARTICLE";
+        return "Статья";
     }
 
-    public String getNameProduct() {
-        return titleArticle;
+    public String getName() {
+        return title;
     }
 }
