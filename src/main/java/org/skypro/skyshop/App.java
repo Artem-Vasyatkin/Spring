@@ -5,127 +5,166 @@ import org.skypro.skyshop.model.Article;
 import org.skypro.skyshop.model.Searchable;
 import org.skypro.skyshop.product.DiscountedProduct;
 import org.skypro.skyshop.product.FixPriceProduct;
+import org.skypro.skyshop.product.Product;
 import org.skypro.skyshop.product.SimpleProduct;
 import org.skypro.skyshop.system.BestResultNotFound;
 import org.skypro.skyshop.system.SearchEngine;
 
+import java.util.List;
 
 
 public class App {
     public static void main(String[] args) {
 
-        System.out.println("=== ДЕМОНСТРАЦИЯ ПРОВЕРОК ДАННЫХ ===\n");
+        System.out.println("=== ДЕМОНСТРАЦИЯ РАБОТЫ С ОБНОВЛЕННЫМИ СТРУКТУРАМИ ДАННЫХ ===\n");
 
-        // Демонстрация проверок данных с обработкой исключений
-        demonstrateDataValidation();
+        // Демонстрация работы корзины со списком
+        demonstrateBasketWithList();
 
-        System.out.println("\n=== ДЕМОНСТРАЦИЯ РАБОТЫ ПОИСКА ===\n");
+        System.out.println("\n=== ДЕМОНСТРАЦИЯ РАБОТЫ ПОИСКА СО СПИСКОМ ===\n");
 
-        // Создание корректных данных для демонстрации поиска
-        demonstrateSearchFunctionality();
+        // Демонстрация работы поиска со списком
+        demonstrateSearchWithList();
     }
 
-    private static void demonstrateDataValidation() {
-        // Тестирование неправильных данных с обработкой исключений
+    private static void demonstrateBasketWithList() {
+        ProductBasket basket = new ProductBasket();
 
-        // 1. Неправильное название продукта
-        System.out.println("1. Попытка создания продукта с пустым названием:");
-        try {
-            SimpleProduct invalidProduct = new SimpleProduct("", 1000);
-        } catch (IllegalArgumentException e) {
-            System.out.println("   Ошибка: " + e.getMessage());
+        // Создание продуктов
+        SimpleProduct laptop1 = new SimpleProduct("Ноутбук", 50000);
+        DiscountedProduct mouse1 = new DiscountedProduct("Мышь", 2000, 25);
+        FixPriceProduct keyboard = new FixPriceProduct("Клавиатура");
+        SimpleProduct monitor = new SimpleProduct("Монитор", 20000);
+        DiscountedProduct headphones = new DiscountedProduct("Наушники", 8000, 50);
+        SimpleProduct laptop2 = new SimpleProduct("Ноутбук", 45000); // Второй ноутбук с другим именем
+        SimpleProduct mouse2 = new SimpleProduct("Мышь", 1500); // Вторая мышь
+
+        System.out.println("1. Добавление продуктов в корзину (без ограничения по количеству):");
+
+        // Добавляем много продуктов - теперь нет ограничения в 5 элементов
+        basket.addProduct(laptop1);
+        basket.addProduct(mouse1);
+        basket.addProduct(keyboard);
+        basket.addProduct(monitor);
+        basket.addProduct(headphones);
+        basket.addProduct(laptop2);
+        basket.addProduct(mouse2);
+
+        System.out.println("   В корзине теперь " + basket.getProductCount() + " товаров");
+        basket.printBasket();
+
+        // Демонстрация удаления продукта по имени (существующий продукт)
+        System.out.println("\n2. Удаление существующего продукта 'Мышь':");
+        List<Product> removedProducts = basket.removeProduct("Мышь");
+
+        if (!removedProducts.isEmpty()) {
+            System.out.println("   Удаленные продукты:");
+            for (Product removed : removedProducts) {
+                System.out.println("   - " + removed.toString());
+            }
+        } else {
+            System.out.println("   Список пуст");
         }
 
-        // 2. Неправильная цена
-        System.out.println("\n2. Попытка создания продукта с ценой 0:");
-        try {
-            SimpleProduct invalidPrice = new SimpleProduct("Телефон", 0);
-        } catch (IllegalArgumentException e) {
-            System.out.println("   Ошибка: " + e.getMessage());
+        System.out.println("\n   Содержимое корзины после удаления:");
+        basket.printBasket();
+
+        // Демонстрация удаления несуществующего продукта
+        System.out.println("\n3. Удаление несуществующего продукта 'Принтер':");
+        List<Product> removedNonExistent = basket.removeProduct("Принтер");
+
+        if (!removedNonExistent.isEmpty()) {
+            System.out.println("   Удаленные продукты:");
+            for (Product removed : removedNonExistent) {
+                System.out.println("   - " + removed.toString());
+            }
+        } else {
+            System.out.println("   Список пуст - продукт 'Принтер' не найден в корзине");
         }
 
-        // 3. Неправильный процент скидки
-        System.out.println("\n3. Попытка создания продукта со скидкой 150%:");
-        try {
-            DiscountedProduct invalidDiscount = new DiscountedProduct("Планшет", 20000, 150);
-        } catch (IllegalArgumentException e) {
-            System.out.println("   Ошибка: " + e.getMessage());
+        System.out.println("\n   Содержимое корзины остается неизменным:");
+        basket.printBasket();
+
+        // Демонстрация удаления продукта, который есть в нескольких экземплярах
+        System.out.println("\n4. Удаление продукта 'Ноутбук' (несколько экземпляров):");
+        List<Product> removedLaptops = basket.removeProduct("Ноутбук");
+
+        if (!removedLaptops.isEmpty()) {
+            System.out.println("   Удаленные ноутбуки:");
+            for (Product removed : removedLaptops) {
+                System.out.println("   - " + removed.toString());
+            }
+            System.out.println("   Всего удалено: " + removedLaptops.size() + " ноутбук(ов)");
+        } else {
+            System.out.println("   Список пуст");
         }
 
-        // 4. Отрицательная базовая цена
-        System.out.println("\n4. Попытка создания продукта с отрицательной ценой:");
-        try {
-            DiscountedProduct negativePrice = new DiscountedProduct("Мышь", -100, 10);
-        } catch (IllegalArgumentException e) {
-            System.out.println("   Ошибка: " + e.getMessage());
-        }
+        System.out.println("\n   Финальное содержимое корзины:");
+        basket.printBasket();
 
-        // 5. Неправильное название статьи
-        System.out.println("\n5. Попытка создания статьи с пустым названием:");
-        try {
-            Article invalidArticle = new Article("   ", "Текст статьи");
-        } catch (IllegalArgumentException e) {
-            System.out.println("   Ошибка: " + e.getMessage());
-        }
-
-        // 6. Неправильный текст статьи
-        System.out.println("\n6. Попытка создания статьи с пустым текстом:");
-        try {
-            Article emptyTextArticle = new Article("Заголовок", null);
-        } catch (IllegalArgumentException e) {
-            System.out.println("   Ошибка: " + e.getMessage());
-        }
-
-        // 7. Успешное создание объектов
-        System.out.println("\n7. Успешное создание корректных объектов:");
-        try {
-            SimpleProduct validProduct = new SimpleProduct("Ноутбук", 50000);
-            DiscountedProduct validDiscounted = new DiscountedProduct("Мышь", 2000, 25);
-            Article validArticle = new Article("Обзор техники", "Отличный ноутбук для работы и игр.");
-
-            System.out.println("   Продукт создан: " + validProduct.getNameProduct());
-            System.out.println("   Продукт со скидкой создан: " + validDiscounted.getNameProduct());
-            System.out.println("   Статья создана: " + validArticle.getTitleArticle());
-        } catch (IllegalArgumentException e) {
-            System.out.println("   Неожиданная ошибка: " + e.getMessage());
-        }
+        // Демонстрация очистки корзины
+        System.out.println("\n5. Очистка корзины:");
+        basket.clearBasket();
+        basket.printBasket();
     }
 
-    private static void demonstrateSearchFunctionality() {
-        // Создание поискового движка и добавление данных
-        SearchEngine searchEngine = new SearchEngine(20);
+    private static void demonstrateSearchWithList() {
+        SearchEngine searchEngine = new SearchEngine(10);
 
         // Добавление товаров
-        searchEngine.add(new SimpleProduct("Ноутбук игровой", 70000));
+        searchEngine.add(new SimpleProduct("Игровой ноутбук", 70000));
         searchEngine.add(new DiscountedProduct("Игровая мышь", 3000, 15));
         searchEngine.add(new FixPriceProduct("Игровая клавиатура"));
-        searchEngine.add(new SimpleProduct("Монитор игровой", 25000));
+        searchEngine.add(new SimpleProduct("Игровой монитор", 25000));
         searchEngine.add(new DiscountedProduct("Игровые наушники", 5000, 20));
+        searchEngine.add(new SimpleProduct("Обычный ноутбук", 40000));
+        searchEngine.add(new SimpleProduct("Офисная мышь", 1000));
 
-        // Добавление статей с повторяющимися словами для тестирования
-        searchEngine.add(new Article("Игровые ноутбуки 2024",
-                "Лучшие игровые ноутбуки 2024 года. Игровые ноутбуки становятся все мощнее."));
-        searchEngine.add(new Article("Обзор игровой мыши",
-                "Игровая мышь для профессиональных геймеров. Игровая мышь должна быть удобной."));
-        searchEngine.add(new Article("Топ игровых мониторов",
-                "Игровые мониторы с высокой частотой обновления. Игровые мониторы важны для комфортной игры."));
+        // Добавление статей
+        searchEngine.add(new Article("Обзор игровых ноутбуков",
+                "Лучшие игровые ноутбуки 2024 года. Игровые ноутбуки для геймеров."));
+        searchEngine.add(new Article("Выбор игровой мыши",
+                "Как выбрать игровую мышь. Игровая мышь должна быть удобной для длительных игровых сессий."));
+        searchEngine.add(new Article("Игровые аксессуары",
+                "Топ игровых аксессуаров для комфортной игры. Игровые клавиатуры, мыши и наушники."));
 
-        // Демонстрация обычного поиска
-        System.out.println("1. Обычный поиск по запросу 'игровой':");
-        Searchable[] results = searchEngine.search("игровой");
-        for (Searchable result : results) {
-            if (result != null) {
+        // Демонстрация поиска с возвратом всех результатов
+        System.out.println("1. Поиск ВСЕХ результатов по запросу 'игровой':");
+        List<Searchable> allResults = searchEngine.search("игровой");
+
+        System.out.println("   Найдено " + allResults.size() + " результатов:");
+        for (Searchable result : allResults) {
+            System.out.println("   - " + result.getStringRepresentation());
+        }
+
+        // Демонстрация поиска с небольшим количеством результатов
+        System.out.println("\n2. Поиск ВСЕХ результатов по запросу 'офисная':");
+        List<Searchable> officeResults = searchEngine.search("офисная");
+
+        System.out.println("   Найдено " + officeResults.size() + " результатов:");
+        for (Searchable result : officeResults) {
+            System.out.println("   - " + result.getStringRepresentation());
+        }
+
+        // Демонстрация поиска без результатов
+        System.out.println("\n3. Поиск ВСЕХ результатов по запросу 'планшет':");
+        List<Searchable> tabletResults = searchEngine.search("планшет");
+
+        if (tabletResults.isEmpty()) {
+            System.out.println("   Результаты не найдены");
+        } else {
+            System.out.println("   Найдено " + tabletResults.size() + " результатов:");
+            for (Searchable result : tabletResults) {
                 System.out.println("   - " + result.getStringRepresentation());
             }
         }
 
-        // Демонстрация поиска лучшего совпадения (успешный случай)
-        System.out.println("\n2. Поиск лучшего совпадения для 'игровой':");
+        // Демонстрация поиска лучшего совпадения (работает как и раньше)
+        System.out.println("\n4. Поиск лучшего совпадения для 'игровой':");
         try {
             Searchable bestMatch = searchEngine.findBestMatch("игровой");
             System.out.println("   Лучший результат: " + bestMatch.getStringRepresentation());
 
-            // Покажем сколько раз встречается слово
             String searchTerm = bestMatch.getSearchTerm().toLowerCase();
             int occurrences = countOccurrences(searchTerm, "игровой");
             System.out.println("   Слово 'игровой' встречается " + occurrences + " раз(а)");
@@ -134,39 +173,14 @@ public class App {
             System.out.println("   Ошибка: " + e.getMessage());
         }
 
-        // Демонстрация поиска лучшего совпадения (исключение)
-        System.out.println("\n3. Поиск лучшего совпадения для несуществующего запроса:");
-        try {
-            Searchable bestMatch = searchEngine.findBestMatch("несуществующийзапрос");
-            System.out.println("   Лучший результат: " + bestMatch.getStringRepresentation());
-        } catch (BestResultNotFound e) {
-            System.out.println("   Ошибка: " + e.getMessage());
+        // Демонстрация добавления большого количества элементов (нет ограничения)
+        System.out.println("\n5. Добавление дополнительных элементов в поисковый движок:");
+        for (int i = 1; i <= 10; i++) {
+            searchEngine.add(new SimpleProduct("Дополнительный товар " + i, 1000 * i));
         }
 
-        // Демонстрация с конкретным словом
-        System.out.println("\n4. Поиск лучшего совпадения для 'ноутбук':");
-        try {
-            Searchable bestMatch = searchEngine.findBestMatch("ноутбук");
-            System.out.println("   Лучший результат: " + bestMatch.getStringRepresentation());
-
-            String searchTerm = bestMatch.getSearchTerm().toLowerCase();
-            int occurrences = countOccurrences(searchTerm, "ноутбук");
-            System.out.println("   Слово 'ноутбук' встречается " + occurrences + " раз(а)");
-
-        } catch (BestResultNotFound e) {
-            System.out.println("   Ошибка: " + e.getMessage());
-        }
-
-        // Демонстрация работы корзины с проверенными данными
-        System.out.println("\n=== ПРОВЕРКА РАБОТЫ КОРЗИНЫ ===\n");
-        ProductBasket basket = new ProductBasket();
-        try {
-            basket.addProduct(new SimpleProduct("Проверенный товар", 1000));
-            basket.addProduct(new DiscountedProduct("Товар со скидкой", 2000, 10));
-            basket.printBasket();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Ошибка при добавлении в корзину: " + e.getMessage());
-        }
+        List<Searchable> additionalResults = searchEngine.search("Дополнительный");
+        System.out.println("   Теперь найдено " + additionalResults.size() + " дополнительных товаров");
     }
 
     // Вспомогательный метод для подсчета вхождений
