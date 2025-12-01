@@ -2,46 +2,39 @@ package org.skypro.skyshop.basket;
 
 import org.skypro.skyshop.product.Product;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ProductBasket {
-    private final List<Product> products;
+    private final Map<String, List<Product>> products;
 
 
     public ProductBasket() {
-        this.products = new ArrayList<>();
+        this.products = new HashMap();
 
     }
 
 
     public void addProduct(Product product) {
-        products.add(product);
+        String productName = product.getNameProduct();
+
+        products.putIfAbsent(productName, new ArrayList<>());
+
+        products.get(productName).add(product);
     }
 
     public List<Product> removeProduct(String nameProduct) {
-        List<Product> removeProduct = new ArrayList<>();
-        List<Product> productsToRemove = new ArrayList<>();
+        List<Product> removeProduct = products.remove(nameProduct);
 
-        for (Product product : products) {
-            if (product.getNameProduct().equals(nameProduct)) {
-                productsToRemove.add(product);
-            }
-        }
+        return removeProduct != null ? removeProduct : new ArrayList<>();
 
-        for (Product productToRemove : productsToRemove) {
-            if (products.remove(productToRemove)) {
-                removeProduct.add(productToRemove);
-            }
-        }
-        return removeProduct;
     }
 
     public int getTotalCost() {
         int totalCost = 0;
-        for (Product product : products) {
-            totalCost += product.getPrice();
+        for (List<Product> productList : products.values()) {
+            for (Product product : productList) {
+                totalCost += product.getPrice();
+            }
         }
         return totalCost;
     }
@@ -54,23 +47,25 @@ public class ProductBasket {
 
         int specialCount = 0;
 
-        for (Product product : products) {
-            System.out.println(product.toString());
-            if (product.isSpecial()) {
-                specialCount++;
+        List<String> sortedNames = new ArrayList<>(products.keySet());
+        Collections.sort(sortedNames);
+
+        for (String productName : sortedNames) {
+            List<Product> productList = products.get(productName);
+            for (Product product : productList) {
+                System.out.println(product.toString());
+                if (product.isSpecial()) {
+                    specialCount++;
+                }
             }
         }
         System.out.println("Итого: " + getTotalCost());
-        System.out.println("Специальных товаров в корзине: " + specialCount);
+        System.out.println("Специальные товары в корзине: " + specialCount);
+
     }
 
     public boolean containsProductBuName(String nameProduct) {
-        for (Product product : products) {
-            if (product.getNameProduct().equals(nameProduct)) {
-                return true;
-            }
-        }
-        return false;
+        return products.containsKey(nameProduct);
     }
 
 
@@ -79,7 +74,22 @@ public class ProductBasket {
     }
 
     public int getProductCount() {
-       return products.size();
+        int totalCount = 0;
+
+        for (List<Product> productList : products.values()) {
+            totalCount += productList.size();
+        }
+        return totalCount;
+    }
+
+
+    public List<Product> getAllProducts() {
+        List<Product> allProducts = new ArrayList<>();
+
+        for (List<Product> productList : products.values()) {
+            allProducts.addAll(productList);
+        }
+        return allProducts;
     }
 }
 
